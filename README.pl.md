@@ -1,117 +1,290 @@
-**Read in other languages: [rosyjski](README.md), [polski](README.pl.md).**
+# Пошук зображень
 
-# React homework template
+Напиши застосунок пошуку зображень за ключовим словом. Прев'ю робочого
+застосунку
 
-Ten projekt został stworzony przy pomocy
-[Create React App](https://github.com/facebook/create-react-app). W celu
-zapoznania się z konfiguracją dodatkowych opcji
-[zobacz dokumentację](https://facebook.github.io/create-react-app/docs/getting-started).
+[![Превью](https://i.gyazo.com/76384ee7d41664406ee52acb77351f07.jpg)](https://gyazo.com/76384ee7d41664406ee52acb77351f07)
 
-## Utworzenie repozytorium zgodnie z szablonem
+Створи компоненти `<SearchForm>`, `<ImageCard>`, `<Button>` і `<Modal>`. Для
+створення сітки використовуй styled-components `<Grid>` та `<GridItem>`
 
-Wykorzystaj to repozytorium organizacji GoIT jako szablon do utworzenia
-repozytorium własnego projektu. W tym celu kliknij na przycisk
-`"Use this template"` i wybierz opcję `"Create a new repository"`, jak pokazano
-na rysunku.
+> Тут самі файли [Grid](./src/components/Grid/Grid.styled.jsx)
 
-![Creating repo from a template step 1](./assets/template-step-1.png)
+## Інструкція Pexels API
 
-W następnym kroku otworzy się strona utworzenia nowego repozytorium. Wypełnij
-pole nazwy i upewnij się, że repozytorium jest publiczne, a następnie kliknij na
-przycisk `"Create repository from template"`.
+Для HTTP-запитів використовуй публічний сервіс пошуку зображень
+[ Pexels](https://www.pexels.com/api/documentation/). Зареєструйся та отримай
+приватний ключ доступу.
 
-![Creating repo from a template step 2](./assets/template-step-2.png)
+Приклад HTTP-запиту.
 
-Po utworzeniu repozytorium, należy przejść do jego ustawień w zakładce `Settings` > `Actions` > `General`, jak pokazano na rysunku.
+```js
+import axios from 'axios';
 
-![Settings GitHub Actions permissions step 1](./assets/gh-actions-perm-1.png)
-
-Przescrolluj stronę do samego końca, w sekcji `«Workflow permissions»` wybierz opcję `«Read and write permissions»` i zaznacz pole w checkboksie. Jest to niezbędne do automatyzacji procesu deploymentu projektu.
-
-![Settings GitHub Actions permissions step 2](./assets/gh-actions-perm-2.png)
-
-Teraz masz własne repozytorium projektu, ze strukturą folderów i plików jak w
-szablonie. Pracuj z nim jak z innymi repozytoriami, klonuj je na swój komputer,
-pisz kod, rób commity i wysyłaj na GitHub.
-
-## Przygotowanie do pracy
-
-1. Upewnij się, że na komputerze zainstalowana jest wersja LTS Node.js.
-   [Ściągnij i zainstaluj](https://nodejs.org/en/), jeżeli trzeba.
-2. Utwórz bazowe zależności projektu przy pomocy polecenia `npm install`.
-3. Włącz tryb pracy, wykonując polecenie `npm start`.
-4. Przejdź w przeglądarce pod adres
-   [http://localhost:3000](http://localhost:3000). Ta strona będzie
-   automatycznie przeładowywać się po zapisaniu zmian w plikach projektu.
-
-## Deployment
-
-Produkcyjna wersja projektu będzie automatycznie poddana pracy lintera, budowana
-i deployowana na GitHub Pages, w gałęzi `gh-pages` za każdym razem, gdy
-aktualizuje się gałąź `main`, na przykład po bezpośrednim pushu lub przyjętym
-pull requeście. W tym celu należy w pliku `package.json` zredagować pole
-`homepage`, zamieniając `your_username` i `your_repo_name` na swoje nazwy i
-wysłać zmiany do GitHub.
-
-```json
-"homepage": "https://your_username.github.io/your_repo_name/"
+const API_KEY = '';
+axios.defaults.baseURL = 'https://api.pexels.com/v1/';
+axios.defaults.headers.common['Authorization'] = API_KEY;
+axios.defaults.params = {
+  orientation: 'landscape',
+  per_page: 15,
+};
 ```
 
-Następnie należy przejść do ustawień repozytorium GitHub (`Settings` > `Pages`)
-i wydystrybuować wersję produkcyjną plików z folderu `/root` gałęzi `gh-pages`,
-jeśli nie zostało to wykonane automatycznie.
+Pexels API підтримує пагінацію, за замовчуванням параметр `page` дорівнює `1`.
+Нехай у відповіді надходить по 15 об'єктів, встановлено в параметрі `per_page`.
+Не забудь, що під час пошуку за новим ключовим словом, необхідно скидати
+значення `page` до `1`.
 
-![GitHub Pages settings](./assets/repo-settings.png)
+У відповіді від API приходить масив об'єктів, в яких тобі цікаві лише наступні
+властивості.
 
-### Status deploymentu
+- `id` - унікальний ідентифікатор
+- `avg_color` - колір фотографії,
+- `alt` - опис фото,
+- `src` - об'єкт з розмірами картинок, нам цікавий розмір `large`
 
-Status deploymentu ostatniego commitu wyświetla się jako ikona obok jego
-identyfikatora.
+## Опис компонента `<SearchForm>`
 
-- **Żółty kolor** - wykonuje się zbudowanie i deployment projektu.
-- **Zielony kolor** - deploymnt zakończył się sukcesem.
-- **Czerwony kolor** - podczas pracy lintera, budowania lub deploymentu wystąpił
-  błąd.
-
-Bardziej szczegółowe informacje o statusie można zobaczyć po kliknięciu na
-ikonkę i przejściu w wyskakującym oknie do odnośnika `Details`.
-
-![Deployment status](./assets/deploy-status.png)
-
-### Deployowana strona
-
-Po jakimś czasie, zazwyczaj kilku minut, zdeployowaną stronę będzie można
-zobaczyć pod adresem wskazanym w zredagowanej właściwości `homepage`. Tutaj na
-przykład znajduje się odnośnik do zdeployowanej strony w wersji dla tego
-repozytorium
-[https://goitacademy.github.io/react-homework-template](https://goitacademy.github.io/react-homework-template).
-
-Jeżeli otwiera się pusta strona, upewnij się, że w zakładce `Console` nie ma
-błędów związanych z nieprawidłowymi ścieżkami do plików CSS i JS projektu
-(**404**). Najprawdopodobniej wprowadzona została niewłaściwa wartość
-właściwości `homepage` w pliku `package.json`.
-
-### Trasowanie
-
-Jeżeli aplikacja wykorzystuje bibliotekę `react-router-dom` dla trasowania,
-należy uzupełniająco skonfigurować komponent `<BrowserRouter>`, przekazując w
-propsie `basename` dokładną nazwę twojego repozytorium. Slash na początku i na
-końcu łańcucha jest obowiązkowy.
+Компонент приймає один проп `onSubmit` - функцію для передачі значення інпута
+під час сабміту форми. Він буде наступної структури.
 
 ```jsx
-<BrowserRouter basename="/your_repo_name/">
-  <App />
-</BrowserRouter>
+<SearchFormStyled>
+  <FormBtn type="submit">
+    <FiSearch size="16px" />
+  </FormBtn>
+  <InputSearch
+    placeholder="What do you want to write?"
+    name="search"
+    required
+    autoFocus
+  />
+</SearchFormStyled>
 ```
 
-## Jak to działa
+## Опис компонента галереї `<Grid/>`
 
-![How it works](./assets/how-it-works.png)
+Список карток зображень. Створює компонент наступної структури.
 
-1. Po każdym pushu do gałęzi `main` repozytorium GitHub, uruchamia się specjalny
-   skrypt (GitHub Action) z pliku `.github/workflows/deploy.yml`.
-2. Wszystkie pliki repozytorium kopiują się na serwer, gdzie projekt zostaje
-   zainicjowany i przechodzi pracę lintera oraz zbudowanie przed deploymentem.
-3. Jeżeli wszystkie kroki zakończyły się sukcesem, zbudowana wersja produkcyjna
-   plików projektu wysyłana jest do gałęzi `gh-pages`. W przeciwnym razie, w
-   logu wykonania skryptu zostanie wskazane z czym jest problem.
+```jsx
+<Grid>
+  {/*
+    Набір <CardItem></CardItem> із зображеннями
+    */}
+</Grid>
+```
+
+## Опис компонента `<GridItem>`
+
+Компонент елемента списку із зображенням. Створює компонент наступної структури.
+
+```jsx
+<GridItem>
+  <CardItem>
+    <img src="" alt="" />
+  </CardItem>
+</GridItem>
+```
+
+## Опис компонента `<Button>`
+
+При натисканні на кнопку `Load more` повинна довантажуватись наступна порція
+зображень і рендеритися разом із попередніми. Кнопка повинна рендеритися лише
+тоді, коли є якісь завантажені зображення. Якщо масив зображень порожній, кнопка
+не рендериться.
+
+# TODO LIST
+
+- Напиши застосунок зберігання todo-листів.
+- Використовуй методи життєвого циклу.
+- Під час додавання та видалення контакту контакти зберігаються у
+  `localStorage`.
+- Під час завантаження застосунку todo-листа, якщо такі є, зчитуються з
+  локального сховища і записуються у `state`.
+
+## Крок 1
+
+Застосунок повинен складатися з форми і списку todo-листів. На поточному кроці
+реалізуй додавання тудушки та відображення їх списку. Застосунок повинен
+зберігати тудушки між різними сесіями (оновлення сторінки).
+
+Використовуйте готову структуру форми з попередньго таска: компонент
+`<SearchForm/>` приймає один проп `onSubmit` - функцію для передачі значення
+інпута під час сабміту форми.
+
+```jsx
+<SearchFormStyled>
+  <FormBtn type="submit">
+    <FiSearch size="16px" />
+  </FormBtn>
+  <InputSearch
+    placeholder="What do you want to write?"
+    name="search"
+    required
+    autoFocus
+  />
+</SearchFormStyled>
+```
+
+`state`, що зберігається в батьківському компоненті `<Todos/>`, обов'язково
+повинен бути наступного вигляду.
+
+```bash
+state = {
+  todos: [],
+}
+```
+
+Кожна todo повинна бути об'єктом з властивостями `text` та `id`. Для генерації
+ідентифікаторів використовуй будь-який відповідний пакет, наприклад
+[nanoid](https://www.npmjs.com/package/nanoid). Після завершення цього кроку,
+застосунок повинен виглядати приблизно так.
+
+[![preview](https://i.gyazo.com/de0115918db7d989fbdc10f1744c11c3.png)](https://gyazo.com/de0115918db7d989fbdc10f1744c11c3)
+
+### Опис компонента галереї `<Grid/>`
+
+Список карток тудушок. Створює компонент наступної структури.
+
+```jsx
+<Grid>{/* Набір <GridItem ></CardItem> із тудушками */}</Grid>
+```
+
+### Опис компонента `<GridItem/>`
+
+Компонент елемента тудушки. Створює компонент наступної структури.
+
+```jsx
+<GridItem>
+  <Todo />
+</GridItem>
+```
+
+### Опис компонента `<Todo/>`
+
+Компонент тудушки. Створює компонент наступної структури.
+
+```jsx
+<TodoWrapper>
+  <Text textAlign="center" marginBottom="20px">
+    TODO #1
+  </Text>
+  <Text>Some description</Text>
+  <DeleteButton type="button">
+    <RiDeleteBinLine size={24} />
+  </DeleteButton>
+</TodoWrapper>
+```
+
+Кореневий компонент програми виглядатиме так.
+
+```jsx
+<SearchForm />
+  <Grid>
+    <GridItem>
+      <Todo/>
+    </GridItem>
+  </Grid>
+```
+
+## Крок 2
+
+Розшир функціонал застосунку, дозволивши користувачеві видаляти раніше збережені
+тудушки.
+
+[![preview](https://i.gyazo.com/8bf303fed0163b544d5c2314fe1df133.gif)](https://gyazo.com/8bf303fed0163b544d5c2314fe1df133)
+
+## Крок 3
+
+За бажанням додай функціонал редагування карточки
+
+Для цього потрібно використати додаткову форму, в якій потрібно підставити текст
+зі створеної тудушки та додати в неї дві кнопки - `Cancel` `Edit`
+
+В `state` додай властивості:
+
+- `isEditing` - буль, що сигнілізує чи можливо включити "режим редагування"
+
+  > В залежності від значення ми будемо показувати або `<SearchForm/>`, або
+  > `<EditForm/>`
+
+- `currentTodo` - об'єкт, який буде в собі зберігати інформацію про тудушку яку
+  треба відредагувати
+
+```bash
+state = {
+  todos: [],
+  isEditing: false,
+  currentTodo: {},
+}
+```
+
+### Опис компонента `<EditForm/>`
+
+Компонент приймає декілька пропсів. Для зручності можна створити як
+функціональний компонент:
+
+- `onUpdate` - функцію для оновлення тудушки
+- `onCancel` - функцію для відміни редагування
+- `onChange` - функцію зчитання нового значення з інпута
+- `currentTodo` - тудушка, яку в даний час ми редагуємо; потрібно для
+  підстановки існуючого опису в інпут, записуємо в значення `defaultValue`
+
+Компонент форми буде наступної структури.
+
+```jsx
+<SearchFormStyled>
+  <BtnEdit type="button">
+    <MdOutlineCancel size="16px" color="red" />
+  </BtnEdit>
+
+  <FormBtn type="submit">
+    <RiSaveLine size="16px" color="green" />
+  </FormBtn>
+
+  <InputSearch
+    placeholder="EDIT TODO"
+    name="edit"
+    required
+    defaultValue={currentTodo.text}
+    autoFocus
+  />
+</SearchFormStyled>
+```
+
+### Опис компонента `<Todo>`
+
+В компонент тудушки додаємо кнопку для редагування. Створює компонент наступної
+структури.
+
+```jsx
+<TodoWrapper>
+  <Text textAlign="center" marginBottom="20px">
+    TODO #1
+  </Text>
+  <Text>{text}</Text>
+  <DeleteButton type="button">
+    <RiDeleteBinLine size={24} />
+  </DeleteButton>
+
+  <EditButton type="button">
+    <RiEdit2Line size={24} />
+  </EditButton>
+</TodoWrapper>
+```
+
+### Додай функціонал покроково:
+
+- додай функцію, яка покаже форму редагування, наприклад `handleEdit`
+- додай функцію, відмінить редагування та залишить все як є, наприклад
+  `handleCancel`
+- додай функцію, змініть `state` значення `currentTodo` та додасть туди
+  оновлений текст, наприклад `handleInputEditChange(event)`
+- додай функцію, оновить стейт всіх тудушoк значення `todos` та додасть туди
+  оновлену тудушку, наприклад `handleInputEditChange(id,updatedTodo)`
+- додай функцію, яка по події сабміт додасть в `state` та оновить список ,
+  наприклад `handleEditFormUpdate(e)`
+
+Прев'ю фінального результата роботи додатку
+
+[![preview](https://i.gyazo.com/57595efde1dbe5b2bd7ab49895b5343a.gif)](https://gyazo.com/57595efde1dbe5b2bd7ab49895b5343a)
